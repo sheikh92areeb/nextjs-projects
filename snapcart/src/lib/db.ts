@@ -1,0 +1,31 @@
+import mongoose from "mongoose";
+
+const mongodbUrl = process.env.MONGODB_URL
+
+if (!mongodbUrl){
+    throw new Error("db error")
+}
+
+let cached = global.mongoose
+if (!cached){
+    cached = global.mongoose= {connection:null,promise:null}
+}
+
+const connectDB = async () => {
+    if (cached.connection) {
+        return cached.connection
+    }
+
+    if (!cached.promise) {
+        cached.promise = mongoose.connect(mongodbUrl).then((conn)=> conn.connection)
+    }
+
+    try {
+        const conn = await cached.promise
+        return conn
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export default connectDB
