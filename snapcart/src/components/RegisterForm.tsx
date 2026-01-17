@@ -1,18 +1,93 @@
-import { ArrowLeft } from 'lucide-react'
-import React from 'react'
+import { ArrowLeft, EyeIcon, EyeOff, Leaf, Lock, Mail, User } from 'lucide-react'
+import React, { useState } from 'react'
+import { motion } from "motion/react"
 
 type PropType = {
     previousStep: (s:number)=>void
 }
 
 function RegisterForm({previousStep}:PropType) {
+
+  const [name, setName] = useState("")
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [shoPassword, setShowPassword] = useState(false)
+
   return (
     <div className='flex flex-col items-center justify-center min-h-screen px-6 py-10 bg-white relative'>
-      <div className='absolute left-6 top-6 flex items-center gap-2 text-green-700 hover:text-green-800 transition-colors cursor-pointer'
-      onClick={() => previousStep(1)} >
+      <div className='absolute left-6 top-6 flex items-center gap-2 text-green-700 hover:text-green-800 transition-colors cursor-pointer' onClick={() => previousStep(1)} >
         <ArrowLeft className='w-5 h-5' />
         <span className='font-medium'>Back</span>
       </div>
+
+      <motion.h1
+        initial={{
+          y:-10,
+          opacity:0
+        }}
+        animate={{
+          y:0,
+          opacity:1
+        }}
+        transition={{
+          duration:0.6
+        }}
+        className='text-4xl font-extrabold text-green-700 mb-2'
+      >
+        Create Account
+      </motion.h1>
+      <p className='text-gray-600 mb-8 flex items-center'>
+        Join Snapcart today
+        <Leaf className='w-5 h-5 text-green-600' />
+      </p>
+      <motion.form
+        className='flex flex-col gap-5 w-full max-w-sm'
+        initial={{
+          opacity:0
+        }}
+        animate={{
+          opacity:1
+        }}
+        transition={{
+          duration:0.6
+        }}
+      >
+        <div className='relative'>
+          <User className='absolute left-3 top-3.5 w-5 h-5 text-gray-400' />
+          <input type="text" placeholder='Your Name' className='w-full border border-gray-300 rounded-xl py-3 pl-10 pr-4 text-gray-800 focus:ring-2 focus:ring-green-500 focus:outline-none' onChange={(e)=>setName(e.target.value)} value={name} />
+        </div>
+
+        <div className='relative'>
+          <Mail className='absolute left-3 top-3.5 w-5 h-5 text-gray-400' />
+          <input type="email" placeholder='Your Email' className='w-full border border-gray-300 rounded-xl py-3 pl-10 pr-4 text-gray-800 focus:ring-2 focus:ring-green-500 focus:outline-none' onChange={(e)=>setEmail(e.target.value)} value={email} />
+        </div>
+
+        <div className='relative'>
+          <Lock className='absolute left-3 top-3.5 w-5 h-5 text-gray-400' />
+          <input type={shoPassword?"text":"password"} placeholder='Your Password' className='w-full border border-gray-300 rounded-xl py-3 pl-10 pr-4 text-gray-800 focus:ring-2 focus:ring-green-500 focus:outline-none' onChange={(e)=>setPassword(e.target.value)} value={password} />
+          { shoPassword?(
+            <EyeOff className='absolute right-3 top-3.5 w-5 h-5 text-gray-500 cursor-pointer' onClick={()=>setShowPassword(false)} />
+          ):(
+            <EyeIcon className='absolute right-3 top-3.5 w-5 h-5 text-gray-500 cursor-pointer' onClick={()=>setShowPassword(true)} />
+          ) }
+        </div>
+
+        {
+          (()=>{
+            const formValidation = name !== "" && email !== "" && password !== ""
+            return <button className={`w-full font-semibold py-3 rounded-xl transition-all duration-200 shadow-md inline-flex items-center justify-center gap-2 ${formValidation?"bg-green-600 hover:bg-green-700 text-white":"bg-gray-300 hover:bg-gray-500 cursor-not-allowed"}`}>
+              Register
+            </button>
+          })()
+        }
+
+        <div className='flex items-center gap-2 text-gray-400 text-sm mt-2'>
+          <span className='flex-1 h-px bg-gray-200'></span>
+          OR
+          <span className='flex-1 h-px bg-gray-200'></span>
+        </div>
+
+      </motion.form>
     </div>
   )
 }
