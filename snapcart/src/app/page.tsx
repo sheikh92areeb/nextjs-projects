@@ -1,6 +1,12 @@
+import { auth } from '@/auth'
+import connectDB from '@/lib/db'
+import User from '@/models/user.model'
 import React from 'react'
 
-const Home = () => {
+async function Home() {
+  await connectDB()
+  const session = await auth()
+  console.log(session)
   return (
     <div>
       
