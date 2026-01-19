@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 import { motion } from 'motion/react'
 import { ArrowRight, Bike, User, UserCog } from 'lucide-react'
 import axios from 'axios'
+import { redirect } from 'next/navigation'
 
 function EditRoleMobile() {
   const [roles, setRoles] = useState([
@@ -15,9 +16,14 @@ function EditRoleMobile() {
 
   const handleEdit = async () => {
     try {
-      const result = await axios.post("/api/user/edit-role-mobile", )
+      const result = await axios.post("/api/user/edit-role-mobile", {
+        role: selectedRole,
+        mobile
+      })
+      console.log(result.data)
+      redirect("/")
     } catch (error) {
-      
+      console.log(error)
     }
   }
 
@@ -93,6 +99,7 @@ function EditRoleMobile() {
             delay:0.7
         }}
         className={`inline-flex items-center gap-2 font-semibold py-3 px-8 rounded-2xl shadow-md transition-all duration-200 w-fit mt-4 ${ selectedRole && mobile.length == 12 ? "bg-green-600 hover:bg-green-700 text-white" : "bg-gray-300 text-gray-700 cursor-not-allowed" }`}
+        onClick={handleEdit}
       >
         Go to Home
         <ArrowRight />

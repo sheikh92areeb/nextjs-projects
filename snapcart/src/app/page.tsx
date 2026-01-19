@@ -1,5 +1,6 @@
 import { auth } from '@/auth'
 import EditRoleMobile from '@/components/EditRoleMobile'
+import Nav from '@/components/Nav'
 import connectDB from '@/lib/db'
 import User from '@/models/user.model'
 import { redirect } from 'next/navigation'
@@ -17,10 +18,12 @@ async function Home() {
     return <EditRoleMobile />
   }
 
+  const plainUser = JSON.parse(JSON.stringify(user))
+
   return (
-    <div>
-      
-    </div>
+    <>
+      <Nav user={plainUser} />
+    </>
   )
 }
 
