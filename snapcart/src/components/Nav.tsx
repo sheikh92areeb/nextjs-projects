@@ -1,10 +1,11 @@
 'use client'
-import { Package, Search, ShoppingCartIcon, User } from 'lucide-react'
+import { LogOut, Package, Search, ShoppingCartIcon, User } from 'lucide-react'
 import mongoose from 'mongoose'
 import { AnimatePresence, motion } from 'motion/react'
+import { signOut } from 'next-auth/react'
 import Image from 'next/image'
 import Link from 'next/link'
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 interface IUser {
     _id?: mongoose.Types.ObjectId
@@ -19,6 +20,17 @@ interface IUser {
 function Nav({ user }: {user:IUser}) {
 
     const [open, setOpen] = useState(false)
+    const profileDropDown = useRef<HTMLDivElement>(null)
+
+    useEffect(()=>{
+      const handleClickOutside = (e:MouseEvent) => {
+        if (profileDropDown.current && !profileDropDown.current.contains(e.target as Node)) {
+          setOpen(false)
+        }
+      }
+      document.addEventListener("mousedown", handleClickOutside)
+      return document.removeEventListener()
+    },[])
     
   return (
     <div className='w-[95%] fixed top-4 left-1/2 -translate-x-1/2 bg-linear-to-r from-green-500 to-green-700 rounded-2xl shadow-lg shadow-black/30 flex justify-between items-center h-20 px-4 md:px-8 z-50'>
@@ -37,7 +49,7 @@ function Nav({ user }: {user:IUser}) {
             <span className='absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full font-semibold shadow' >0</span>
         </Link>
 
-        <div className="relative">
+        <div className="relative" ref={profileDropDown}>
           <div className='bg-white rounded-full w-11 h-11 flex items-center justify-center overflow-hidden shadow-md hover:scale-105 transition-transform' onClick={()=>setOpen(prev => !prev)} >
               {user.image? <Image src={user.image} alt='user' fill className='object-cover rounded-full' />: <User/>}
           </div>
@@ -46,7 +58,7 @@ function Nav({ user }: {user:IUser}) {
               <motion.div
                 initial={{ opacity:0, y: -10, scale: 0.95 }}
                 animate={{ opacity:1, y: 0, scale: 1 }}
-                transition={{ duration: 0.6 }}
+                transition={{ duration: 0.4 }}
                 exit={{ opacity:0, y: -10, scale: 0.95 }}
                 className='absolute right-0 mt-3 w-56 bg-white rounded-2xl shadow-xl border border-gray-200 p-3 z-999'
               >
@@ -60,10 +72,20 @@ function Nav({ user }: {user:IUser}) {
                   </div>
                 </div>
 
-                <Link href={""}>
-                  <Package />
+                <Link href={""} className='flex items-center gap-2 px-3 py-3 hover:bg-green-50 rounded-lg text-gray-700 font-medium' onClick={()=>setOpen(false)}>
+                  <Package className='h-5 w-5 text-green-600' />
                   My Orders
                 </Link>
+
+                <button className='flex items-center gap-2 w-full text-left px-3 py-3 hover:bg-red-50 rounded-lg text-gray-700 font-medium'
+                  onClick={()=> {
+                    setOpen(false)
+                    signOut({ callbackUrl:"/login" })
+                  }}
+                >
+                  <LogOut className='h-5 w-5 text-red-600' />
+                  Log Out
+                </button>
               </motion.div>
             )}
           </AnimatePresence>
