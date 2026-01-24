@@ -63,7 +63,7 @@ function Nav({ user }: {user:IUser}) {
             </div>
 
             <div className='flex flex-col gap-3 font-medium mt-6'>
-              <Link href={""} className='flex items-center gap-3 p-3 rounded-lg bg-white/10 hover:bg-white/20 hover:pl-4 transition-all'>
+              <Link href={"/admin/add-grocery"} className='flex items-center gap-3 p-3 rounded-lg bg-white/10 hover:bg-white/20 hover:pl-4 transition-all'>
                 <PlusCircle className='h-5 w-5' />
                 Add Grocery
               </Link>
@@ -116,7 +116,7 @@ function Nav({ user }: {user:IUser}) {
 
         { user.role == "admin" && (<>
           <div className='hidden md:flex items-center gap-4'>
-            <Link href={""} className='flex items-center gap-2 bg-white text-green-700 font-semibold px-4 py-2 rounded-full hover:bg-green-100 transition-all'>
+            <Link href={"/admin/add-grocery"} className='flex items-center gap-2 bg-white text-green-700 font-semibold px-4 py-2 rounded-full hover:bg-green-100 transition-all'>
               <PlusCircle className='h-5 w-5' />
               Add Grocery
             </Link>
