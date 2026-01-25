@@ -1,11 +1,12 @@
 'use client'
+import { RootState } from '@/redux/store'
 import { Leaf, ShoppingCartIcon, Smartphone, Truck } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
 import Image from 'next/image'
 import React, { useEffect, useState } from 'react'
+import { useSelector } from 'react-redux'
 
 function HeroSection() {
-
     const slides = [
         {
             id:1,
