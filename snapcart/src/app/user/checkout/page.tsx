@@ -1,13 +1,15 @@
 'use client'
 import React, { useEffect, useState } from 'react'
 import { motion } from 'motion/react'
-import { ArrowLeft, Building, Home, MapPin, Navigation, Phone, Search, User } from 'lucide-react'
+import { ArrowLeft, Building, Home, Loader2, LocateFixed, MapPin, Navigation, Phone, Search, User } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/redux/store'
-import L, { LatLngExpression } from 'leaflet'
+import axios from 'axios'
 import 'leaflet/dist/leaflet.css'
 import { MapContainer, Marker, TileLayer, useMap } from 'react-leaflet'
+import L, { LatLngExpression } from 'leaflet'
+import { OpenStreetMapProvider } from 'leaflet-geosearch'
 
 const markerIcon = new L.Icon({
     iconUrl:"https://cdn-icons-png.flaticon.com/128/684/684908.png",
@@ -27,6 +29,8 @@ function Checkout() {
         fullAddress: ""
     })
     const [position, setPosition] = useState<[number, number]|null>(null)
+    const [searchQuery, setSearchQuery] = useState("")
+    const [searchLoading, setSearchLoading] = useState(false)
 
     useEffect(()=>{
         if (navigator.geolocation) {
@@ -63,6 +67,45 @@ function Checkout() {
                 }}
             />
         )
+    }
+
+    const handleSearchQuery = async () => {
+        setSearchLoading(true)
+        const provider = new OpenStreetMapProvider()
+        const result = await provider.search({ query: searchQuery })
+        console.log(result)
+        if (result) {
+            setPosition([result[0].y, result[0].x])
+            setSearchLoading(false)
+        }
+    }
+
+    useEffect(()=>{
+        const fetchAddress = async () => {
+            if (!position) return
+            try {
+                const result = await axios.get(`https://nominatim.openstreetmap.org/reverse?lat=${position[0]}&lon=${position[1]}&format=json`)
+                console.log(result.data)
+                setAddress(prev => ({...prev,
+                    city:result.data.address.city, 
+                    state:result.data.address.state, 
+                    pincode:result.data.address.postcode, 
+                    fullAddress:result.data.display_name
+                }))
+            } catch (error) {
+                console.log(error)
+            }
+        }
+        fetchAddress()
+    },[position])
+
+    const handleCurrentLocation = () => {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition((pos)=> {
+                const { latitude, longitude } = pos.coords
+                setPosition([latitude, longitude])
+            },(err) => {console.log("Location Error", err)}, { enableHighAccuracy:true, maximumAge:0, timeout:10000 })
+        }
     }
 
     return (
@@ -123,13 +166,13 @@ function Checkout() {
                             </div>
                         </div>
                         <div className='flex gap-2 mt-3'>
-                            <input type="text" placeholder='Search City or Area...' className='flex-1 border rounded-lg p-3 text-sm focus:ring-2 focus:ring-green-600 outline-none' />
-                            <button className='bg-green-600 text-white px-5 rounded-lg hover:bg-green-700 transition-all font-medium'>
-                                Search
+                            <input type="text" placeholder='Search City or Area...' value={searchQuery} onChange={(e)=>setSearchQuery(e.target.value)} className='flex-1 border rounded-lg p-3 text-sm focus:ring-2 focus:ring-green-600 outline-none' />
+                            <button onClick={handleSearchQuery} className='bg-green-600 text-white px-5 rounded-lg hover:bg-green-700 transition-all font-medium'>
+                                {searchLoading? <Loader2 size={16} className='animate-spin'/>: "Search"}
                             </button>
                         </div>
                         <div className='relative mt-6 h-82.5 rounded-xl overflow-hidden border border-gray-200 shadow-inner'>
-                            { position && (
+                            {position && (
                                 <MapContainer center={position as LatLngExpression} zoom={13} scrollWheelZoom={true} className='w-full h-full' >
                                     <TileLayer 
                                         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' 
@@ -137,7 +180,14 @@ function Checkout() {
                                     />
                                     <DragableMarker />
                                 </MapContainer>
-                            ) }
+                            )}
+                            <motion.button
+                                whileTap={{ scale:0.93 }}
+                                className='absolute bottom-4 right-4 bg-green-600 text-white shadow-lg rounded-full p-3 hover:bg-green-700 transition-all flex items-center justify-center z-999'
+                                onClick={handleCurrentLocation}
+                            >
+                                <LocateFixed size={20} />
+                            </motion.button>
                         </div>
                     </div>
 
