@@ -130,7 +130,7 @@ function Checkout() {
                 paymentMethod
             })
 
-            console.log(result.data)
+            router.push("/user/order-success")
         } catch (error) {
             console.log(error)
         }
