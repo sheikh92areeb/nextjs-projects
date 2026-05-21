@@ -22,6 +22,7 @@ function OrderSuccess() {
         >
           <div className='w-full h-full rounded-full bg-green-700 blur-2xl' />
         </motion.div>
+      </motion.div>
       <motion.h1
         initial={{ opacity:0, y:30 }}
         animate={{ opacity:1, y:0 }}
