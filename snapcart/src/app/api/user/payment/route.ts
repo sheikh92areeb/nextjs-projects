@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
             line_items:[
                 {
                     price_data:{
-                        currency:'usd',
+                        currency:'pkr',
                         product_data:{
                             name:"SnapCart Order Data"
                         },
