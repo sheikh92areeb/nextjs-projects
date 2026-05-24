@@ -163,7 +163,7 @@ function Nav({ user }: {user:IUser}) {
                 </div>
 
                 { user.role == "user" && (
-                  <Link href={""} className='flex items-center gap-2 px-3 py-3 hover:bg-green-50 rounded-lg text-gray-700 font-medium' onClick={()=>setOpen(false)}>
+                  <Link href={"/user/my-orders"} className='flex items-center gap-2 px-3 py-3 hover:bg-green-50 rounded-lg text-gray-700 font-medium' onClick={()=>setOpen(false)}>
                     <Package className='h-5 w-5 text-green-600' />
                     My Orders
                   </Link>
