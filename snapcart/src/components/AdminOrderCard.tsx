@@ -1,10 +1,15 @@
 'use client'
 import { IOrder } from '@/models/order.model'
-import React from 'react'
+import { useState } from 'react'
 import { motion } from 'motion/react'
-import { CreditCard, MapPin, Package, Phone, User } from 'lucide-react'
+import { ChevronRight, ChevronUp, CreditCard, MapPin, Package, Phone, Truck, User } from 'lucide-react'
+import Image from 'next/image'
 
 function AdminOrderCard({ order }: { order:IOrder }) {
+
+    const statusOptions = ["pending", "out of delivery"]
+    const [expended, setExpended] = useState(false)
+
   return (
     <motion.div
         initial={{ opacity:0, y:20 }}
@@ -43,9 +48,64 @@ function AdminOrderCard({ order }: { order:IOrder }) {
                     <span>{order.paymentMethod == "cod" ? "Cash on Delivery" : "Online Payment" }</span>
                 </p>
             </div>
-            <div className='flex flex-col items-start md:items-end gap-2'></div>
+            <div className='flex flex-col items-start md:items-end gap-2'>
+                <span 
+                    className={`text-xs font-semibold px-3 py-1 rounded-full capitalize ${
+                        order.status == 'delivered' ? "bg-green-100 text-green-700" : 
+                        order.status == "pending" ? "bg-yellow-100 text-yellow-700" :
+                        "bg-blue-100 text-blue-700"
+                    }`}
+                >
+                    {order.status}
+                </span>
+                <select className='border border-gray-300 rounded-lg px-3 py-1 text-sm shadow-sm hover:border-green-400 transition focus:right-2 focus:ring-green-500 outline-none'>
+                    {statusOptions.map(st=>(
+                        <option key={st} value={st} >{st.toUpperCase()}</option>
+                    ))}
+                </select>
+            </div>
+        </div> 
+        <div className='border-t border-gray-200 pt-3 mt-3'>
+            <button onClick={()=>setExpended(prev=>!prev)} className='w-full flex justify-between items-center text-sm font-medium text-gary-700 hover:text-green-700 transition'>
+                <span className='flex items-center gap-2'>
+                    <Package size={16} className='text-green-600' />
+                    {expended ? "Hide Order Items" : `view ${order.items.length} Item${order.items.length > 1 ? "s":""}`}
+                </span>
+                {expended ? <ChevronUp size={16} className='text-green-700' /> : <ChevronRight size={16} className='text-green-700' />}
+            </button>
+            <motion.div
+                initial={{ height:0, opacity:0 }}
+                animate={{ height: expended ? "auto" : 0, opacity: expended ? 1 : 0 }}
+                transition={{ duration: 0.3 }}
+                className='overflow-hidden'
+            >
+                <div className='mt-3 space-y-3'>
+                    {order.items.map((item, index) => (
+                        <div key={index} className='flex justify-between items-center bg-gray-50 rounded-xl px-3 py-2 hover:bg-gray-100 transition'>
+                            <div className='flex items-center gap-3'>
+                                <Image src={item.image} alt={item.name} width={48} height={48} className='rounded-lg object-cover border border-gray-200' />
+                                <div>
+                                    <p className='text-sm font-medium text-gray-800'>{item.name}</p>
+                                    <p className='text-xs text-gray-500'>{item.quantity} x {item.unit}</p>
+                                </div>
+                            </div>
+                            <p className='text-sm font-semibold text-gray-800'>
+                                PKR {Number(item.price) * item.quantity}
+                            </p>
+                        </div>
+                    ))}
+                </div>
+            </motion.div>
         </div>
-      
+        <div className='border-t mt-3 pt-3 flex justify-between items-center text-sm font-semibold text-gray-800'>
+            <div className='flex items-center gap-2 text-gray-700 text-sm'>
+                <Truck size={16} className='text-green-600' />
+                <span>Delivery: <span className='text-green-700 font-semibold'>{order.status}</span></span>
+            </div>
+            <div>
+                Total: <span className='text-green-700 font-bold'>PKR {order.totalAmount}</span>
+            </div>
+        </div>
     </motion.div>
   )
 }

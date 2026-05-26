@@ -65,7 +65,7 @@ function UserOrderCard({ order }: { order: IOrder }) {
               <Package size={16} className='text-green-600' />
               {expended ? "Hide Order Items" : `view ${order.items.length} Item${order.items.length > 1 ? "s":""}`}
             </span>
-            {expended ? <ChevronUp /> : <ChevronRight />}
+            {expended ? <ChevronUp size={16} className='text-green-700' /> : <ChevronRight size={16} className='text-green-700' />}
           </button>
           <motion.div
             initial={{ height:0, opacity:0 }}

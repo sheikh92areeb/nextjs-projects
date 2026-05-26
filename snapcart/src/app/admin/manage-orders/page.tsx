@@ -2,7 +2,7 @@
 import AdminOrderCard from '@/components/AdminOrderCard'
 import { IOrder } from '@/models/order.model'
 import axios from 'axios'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, PackageSearch } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
@@ -10,18 +10,26 @@ function ManageOrders() {
 
   const router = useRouter()
   const [orders, setOrders] = useState<IOrder[]>()
+  const [loading, setLoading] = useState(true)
 
   useEffect(()=> {
     const getOrders = async () => {
       try {
         const result = await axios.get("/api/admin/get-orders")
         setOrders(result.data)
+        setLoading(false)
       } catch (error) {
         console.error(error)
       }
     }
     getOrders()
   },[])
+
+  if (loading) {
+    return <div className='flex items-center justify-center min-h-[50vh] text-gray-600'>
+      Loading your orders ....
+    </div>
+  }
 
   return (
     <div className='min-h-screen bg-gray-50 w-full'>
@@ -34,11 +42,18 @@ function ManageOrders() {
         </div>
       </div>
       <div className='max-w-6xl mx-auto px-4 pt-24 pb-16 space-y-8'>
-        <div className='space-y-6'>
-          {orders?.map((order,index) => (
-            <AdminOrderCard key={index} order={order} />
-          ))}
-        </div>
+        {orders?.length == 0 ? 
+          <div className='pt-20 flex flex-col items-center text-center'>
+            <PackageSearch size={70} className='text-green-600 mb-4' />
+            <h2 className='text-xl font-semibold text-gray-700'>No Orders Found</h2>
+          </div>  
+        :
+          <div className='space-y-6'>
+            {orders?.map((order,index) => (
+              <AdminOrderCard key={index} order={order} />
+            ))}
+          </div>
+        }
       </div>
     </div>
   )
