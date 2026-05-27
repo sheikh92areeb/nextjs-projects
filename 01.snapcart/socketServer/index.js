@@ -14,6 +14,13 @@ const io = new Server(server, {
     }
 })
 
+io.on("connection", (socket) => {
+    console.log("User Connected", socket.id)
+
+    socket.on("disconnected", () => {
+        console.log("User Disconnected", socket.id)
+    })
+})
 
 server.listen(port, ()=> {
     console.log("Start server at",port)
