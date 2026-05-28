@@ -9,15 +9,8 @@ interface IUser {
     role: "user" | "deliveryboy" | "admin",
     image?:string
     location?: {
-        type: {
-            type: StringConstructor;
-            enum: string[];
-            default: string;
-        };
-        coordinate: {
-            type: NumberConstructor[];
-            default: number[];
-        };
+        type: "Point"
+        coordinates: number[]
     }
     socketId: string | null
     isOnline: boolean
@@ -36,7 +29,7 @@ const userSchema = new mongoose.Schema<IUser>({
             enum: ["Point"],
             default: "Point"
         },
-        coordinate: {
+        coordinates: {
             type: [Number],
             default: [0,0]
         }

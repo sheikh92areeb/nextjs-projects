@@ -16,13 +16,23 @@ const io = new Server(server, {
 })
 
 io.on("connection", (socket) => {
-    console.log("User Connected", socket.id)
 
     socket.on("identity", async (userId) => {
-        console.log(userId)
+        // console.log(userId)
         await axios.post(`${process.env.NEXT_BASE_URL}/api/socket/connect`, {
             userId,
             socketId: socket.id
+        })
+    })
+
+    socket.on("update-location", async ({ userId, latitude, longitude }) => {
+        const location = {
+            type: "Point",
+            coordinates: [longitude, latitude]
+        }
+        await axios.post(`${process.env.NEXT_BASE_URL}/api/socket/update-location`, {
+            userId,
+            location
         })
     })
 
