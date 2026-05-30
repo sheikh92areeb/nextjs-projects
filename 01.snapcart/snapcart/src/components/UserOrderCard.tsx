@@ -1,13 +1,15 @@
 'use client'
 import { IOrder } from '@/models/order.model'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { motion } from 'motion/react'
 import { Bike, ChevronRight, ChevronUp, CreditCard, MapPin, Package, Truck } from 'lucide-react'
 import Image from 'next/image'
+import { getSocket } from '@/lib/socket'
 
 function UserOrderCard({ order }: { order: IOrder }) {
 
   const [expended, setExpended] = useState(false)
+  const [status, setStatus] = useState(order.status)
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -21,6 +23,16 @@ function UserOrderCard({ order }: { order: IOrder }) {
         return "bg-gray-100 text-gray-700 border-gray-300"
     }
   }
+
+  useEffect((): any => {
+    const socket = getSocket()
+    socket.on("order-status-update", (data) => {
+      if (data.orderId.toString() == order?._id!.toString()) {
+        setStatus(data.status)
+      }
+    })
+    return () => socket.off("order-status-update")
+  }, [])
 
   return (
     <motion.div 
@@ -38,8 +50,8 @@ function UserOrderCard({ order }: { order: IOrder }) {
           <span className={`px-3 py-1 text-xs font-semibold rounded-full border ${order.isPaid ? "bg-green-100 text-green-700 border-green-300" : "bg-red-100 text-red-700 border-red-300"}`}>
             {order.isPaid?"Paid":"Unpaid"}
           </span>
-          <span className={`px-3 py-1 text-xs font-semibold border rounded-full ${getStatusColor(order.status)}`}>
-            {order.status}
+          <span className={`px-3 py-1 text-xs font-semibold border rounded-full ${getStatusColor(status)}`}>
+            {status}
           </span>
         </div>
       </div>
@@ -94,7 +106,7 @@ function UserOrderCard({ order }: { order: IOrder }) {
         <div className='border-t pt-3 flex justify-between items-center text-sm font-semibold text-gray-800'>
           <div className='flex items-center gap-2 text-gray-700 text-sm'>
             <Truck size={16} className='text-green-600' />
-            <span>Delivery: <span className='text-green-700 font-semibold'>{order.status}</span></span>
+            <span>Delivery: <span className='text-green-700 font-semibold'>{status}</span></span>
           </div>
           <div>
             Total: <span className='text-green-700 font-bold'>PKR {order.totalAmount}</span>
