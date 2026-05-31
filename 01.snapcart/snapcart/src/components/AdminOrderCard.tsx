@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { motion } from 'motion/react'
 import { ChevronRight, ChevronUp, CreditCard, MapPin, Package, Phone, Truck, User, UserCheck } from 'lucide-react'
 import Image from 'next/image'
@@ -44,7 +44,7 @@ function AdminOrderCard({ order }: { order:IOrder }) {
 
     const statusOptions = ["pending", "out of delivery"]
     const [expended, setExpended] = useState(false)
-    const [status, setStatus] = useState<string>(order.status)
+    const [status, setStatus] = useState<string>("pending")
 
     const updateStatus = async (orderId:string, status:string) => {
         try {
@@ -55,6 +55,10 @@ function AdminOrderCard({ order }: { order:IOrder }) {
             console.log(error)
         }
     }
+
+    useEffect(()=>{
+        setStatus(order.status)
+    },[order])
 
   return (
     <motion.div

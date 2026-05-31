@@ -74,7 +74,7 @@ function Nav({ user }: {user:IUser}) {
                 <Boxes className='h-5 w-5' />
                 View Grocery
               </Link>
-              <Link href={""} className='flex items-center gap-3 p-3 rounded-lg bg-white/10 hover:bg-white/20 hover:pl-4 transition-all'>
+              <Link href={"/admin/manage-orders"} className='flex items-center gap-3 p-3 rounded-lg bg-white/10 hover:bg-white/20 hover:pl-4 transition-all'>
                 <ClipboardCheck className='h-5 w-5' />
                 Manage Orders
               </Link>

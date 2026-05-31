@@ -1,10 +1,44 @@
 'use client'
-import { IOrder } from '@/models/order.model'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { motion } from 'motion/react'
-import { Bike, ChevronRight, ChevronUp, CreditCard, MapPin, Package, Truck } from 'lucide-react'
+import { Bike, ChevronRight, ChevronUp, CreditCard, MapPin, Package, Truck, UserCheck } from 'lucide-react'
 import Image from 'next/image'
 import { getSocket } from '@/lib/socket'
+import mongoose from 'mongoose'
+import { IUser } from '@/models/user.model'
+
+interface IOrder {
+    _id?:mongoose.Types.ObjectId
+    user:mongoose.Types.ObjectId
+    items:[
+        {
+            grocery:mongoose.Types.ObjectId,
+            name:string,
+            price:string,
+            unit:string,
+            image:string,
+            quantity:number
+        }
+    ]
+    isPaid:boolean
+    totalAmount:number
+    paymentMethod: "cod" | "online"
+    address: {
+        fullname:string,
+        mobile:string,
+        city:string,
+        state:string,
+        pincode:string,
+        fullAddress:string,
+        latitude:number,
+        longitude:number
+    }
+    assignment?: mongoose.Types.ObjectId
+    assignedDeliveryBoy?: IUser
+    status:"pending" | "out of delivery" | "delivered"
+    createdAt?:Date
+    updatedAt?:Date
+}
 
 function UserOrderCard({ order }: { order: IOrder }) {
 
@@ -55,6 +89,7 @@ function UserOrderCard({ order }: { order: IOrder }) {
           </span>
         </div>
       </div>
+      
       <div className='p-5 space-y-4'>
         {order.paymentMethod == "cod" ? 
           <div className='flex items-center gap-2 text-gray-700 text-sm'>
@@ -71,6 +106,26 @@ function UserOrderCard({ order }: { order: IOrder }) {
           <MapPin size={16} className='text-green-600' />
           <span className='truncate'>{order.address.fullAddress}</span>
         </div>
+        {order.assignedDeliveryBoy && (
+          <>
+            <div className="mt-4 bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-center justify-between">
+              <div className='flex items-center gap-3 text-sm text-gray-700'>
+                <UserCheck size={18} className='text-blue-600' />
+                <div className='font-semibold text-gray-800'>
+                  <p>Assigned To: <span>{order.assignedDeliveryBoy.name}</span></p>
+                  <p className='text-xs text-gray-600'>📞 +92 {order.assignedDeliveryBoy.mobile}</p>
+                </div>
+              </div>
+              <a href={`tel:${order.assignedDeliveryBoy.mobile}`} className='bg-blue-600 text-white text-xs px-3 py-1.5 rounded-lg hover:bg-blue-700 transition'>
+                Call
+              </a>
+            </div>
+            <button className='w-full flex items-center justify-center gap-2 bg-green-600 text-white font-semibold px-4 py-2 rounded-xl shadow hover:bg-green-700 transition cursor-pointer'>
+              <Truck size={18} />
+              Track your order
+            </button>
+          </>
+        )}
         <div className='border-t border-gray-200 pt-3'>
           <button onClick={()=>setExpended(prev=>!prev)} className='w-full flex justify-between items-center text-sm font-medium text-gary-700 hover:text-green-700 transition'>
             <span className='flex items-center gap-2'>

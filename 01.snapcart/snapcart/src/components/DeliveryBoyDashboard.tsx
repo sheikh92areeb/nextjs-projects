@@ -3,31 +3,69 @@ import axios from 'axios'
 import { useEffect, useState } from 'react'
 import AssignmentCard from './AssignmentCard'
 import { getSocket } from '@/lib/socket'
+import { useSelector } from 'react-redux'
+import { RootState } from '@/redux/store'
 
 function DeliveryBoyDashboard() {
 
     const [assignments, setAssignments] = useState<any[]>([])
+    const [activeOrder, setActiveOrder] = useState<any>(null)
+    const [userLocation, setUserLocation] = useState<any>(null)
+    const { userData } = useSelector((state:RootState) => state.user)
 
-    useEffect(()=> {
-        const fetchAssignment = async () => {
-            try {
-                const result = await axios.get("/api/delivery/get-assignment")
-                setAssignments(result.data)
-            } catch (error) {
-                console.log(error)
-            }
+    const fetchAssignment = async () => {
+      try {
+        const result = await axios.get("/api/delivery/get-assignment")
+        setAssignments(result.data)
+      } catch (error) {
+        console.log(error)
+      }
+    }
+
+    const fetchCurrentOrder = async () => {
+      try {
+        const result = await axios.get("/api/delivery/current-order")
+        if (result.data.active) {
+          setActiveOrder(result.data.assignment)
+          setUserLocation({
+            latitude: result.data.assignment.order.address.latitude,
+            longitude: result.data.assignment.order.address.longitude
+          })
         }
-        fetchAssignment()
-    },[])
-
+      } catch (error) {
+        console.log(error)
+      }
+    }
+    
     useEffect((): any => {
       const socket = getSocket()
-
       socket.on("new-assignment", (deliveryAssignment)=> {
         setAssignments((prev) => [...prev, deliveryAssignment])
       })
       return () => socket.off("new-assignment")
     },[]) 
+
+    useEffect(()=> {
+      fetchCurrentOrder()    
+      fetchAssignment()
+    },[userData])
+
+
+  if (activeOrder && userLocation) {
+    return (
+      <div className='p-4 pt-30 min-h-screen bg-gray-50'>
+        <div className='max-w-3xl mx-auto'>
+          <h1 className='text-2xl font-bold text-green-700 mb-2'>Active Delivery</h1>
+          <p className='text-gray-600 text-sm mb-4'>
+            Order: #{activeOrder.order._id.slice(-6)}
+          </p>
+          <div className='rounded-xl border shadow-lg overflow-hidden mb-6'>
+            
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className='w-full min-h-screen bg-gray-50 p-4'>
