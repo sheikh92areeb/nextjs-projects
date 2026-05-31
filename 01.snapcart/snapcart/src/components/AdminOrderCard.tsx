@@ -1,10 +1,44 @@
 'use client'
-import { IOrder } from '@/models/order.model'
 import { useState } from 'react'
 import { motion } from 'motion/react'
-import { ChevronRight, ChevronUp, CreditCard, MapPin, Package, Phone, Truck, User } from 'lucide-react'
+import { ChevronRight, ChevronUp, CreditCard, MapPin, Package, Phone, Truck, User, UserCheck } from 'lucide-react'
 import Image from 'next/image'
 import axios from 'axios'
+import mongoose from 'mongoose'
+import { IUser } from '@/models/user.model'
+
+interface IOrder {
+    _id?:mongoose.Types.ObjectId
+    user:mongoose.Types.ObjectId
+    items:[
+        {
+            grocery:mongoose.Types.ObjectId,
+            name:string,
+            price:string,
+            unit:string,
+            image:string,
+            quantity:number
+        }
+    ]
+    isPaid:boolean
+    totalAmount:number
+    paymentMethod: "cod" | "online"
+    address: {
+        fullname:string,
+        mobile:string,
+        city:string,
+        state:string,
+        pincode:string,
+        fullAddress:string,
+        latitude:number,
+        longitude:number
+    }
+    assignment?: mongoose.Types.ObjectId
+    assignedDeliveryBoy?: IUser
+    status:"pending" | "out of delivery" | "delivered"
+    createdAt?:Date
+    updatedAt?:Date
+}
 
 function AdminOrderCard({ order }: { order:IOrder }) {
 
@@ -59,6 +93,20 @@ function AdminOrderCard({ order }: { order:IOrder }) {
                     <CreditCard size={16} className='text-green-600' />
                     <span>{order.paymentMethod == "cod" ? "Cash on Delivery" : "Online Payment" }</span>
                 </p>
+                {order.assignedDeliveryBoy && (
+                    <div className="mt-4 bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-center justify-between">
+                        <div className='flex items-center gap-3 text-sm text-gray-700'>
+                            <UserCheck size={18} className='text-blue-600' />
+                            <div className='font-semibold text-gray-800'>
+                                <p>Assigned To: <span>{order.assignedDeliveryBoy.name}</span></p>
+                                <p className='text-xs text-gray-600'>📞 +92 {order.assignedDeliveryBoy.mobile}</p>
+                            </div>
+                        </div>
+                        <a href={`tel:${order.assignedDeliveryBoy.mobile}`} className='bg-blue-600 text-white text-xs px-3 py-1.5 rounded-lg hover:bg-blue-700 transition'>
+                            Call
+                        </a>
+                    </div>
+                )}
             </div>
             <div className='flex flex-col items-start md:items-end gap-2'>
                 <span 
