@@ -35,7 +35,9 @@ io.on("connection", (socket) => {
             userId,
             location
         })
+        io.emit("update-deliveryBoy-location", { userId, location } )
     })
+
 
     socket.on("disconnect", () => {
         console.log("User Disconnected", socket.id)
