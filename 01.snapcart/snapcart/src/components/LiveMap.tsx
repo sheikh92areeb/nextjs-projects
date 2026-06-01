@@ -1,5 +1,5 @@
-import React from 'react'
-import { MapContainer, Marker, Polyline, Popup, TileLayer } from 'react-leaflet'
+import React, { useEffect } from 'react'
+import { MapContainer, Marker, Polyline, Popup, TileLayer, useMap } from 'react-leaflet'
 // @ts-ignore: side-effect import of Leaflet CSS
 import 'leaflet/dist/leaflet.css'
 import L, { LatLngExpression } from 'leaflet'
@@ -15,6 +15,16 @@ interface Iprops {
   deliveryBoyLocation: ILocation 
 }
 
+function Recenter({positions}: {positions:[number,number]}) {
+  const map = useMap()
+  useEffect(() => {
+    if (positions[0] !== 0 && positions[1] !== 0) {
+      map.setView(positions, map.getZoom(), { animate:true })
+    }
+  },[positions, map])
+  return null
+}
+
 function LiveMap({userLocation, deliveryBoyLocation}:Iprops ) {
 
   const deliveryBoyIcon = L.icon({
@@ -26,13 +36,14 @@ function LiveMap({userLocation, deliveryBoyLocation}:Iprops ) {
     iconSize:[45,45]
   })
 
-  const center = [userLocation.latitude, userLocation.longitude]
+  const center = deliveryBoyLocation ? [deliveryBoyLocation.latitude, deliveryBoyLocation.longitude] : [userLocation.latitude, userLocation.longitude]
 
   const linePosition = deliveryBoyLocation && userLocation ? [[userLocation.latitude, userLocation.longitude],[deliveryBoyLocation.latitude, deliveryBoyLocation.longitude]] : []
 
   return (
     <div className='w-full h-125 rounded-xl overflow-hidden shadow relative'>
       <MapContainer center={center as LatLngExpression} zoom={13} scrollWheelZoom={true} className='w-full h-full' >
+        <Recenter positions={center as any} />
         <TileLayer 
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' 
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" 
