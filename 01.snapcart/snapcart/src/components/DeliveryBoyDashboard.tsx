@@ -19,6 +19,8 @@ function DeliveryBoyDashboard() {
     const [activeOrder, setActiveOrder] = useState<any>(null)
     const [userLocation, setUserLocation] = useState<ILocation>({latitude:0,longitude:0})
     const [deliveryBoyLocation, setDeliveryBoyLocation] = useState<ILocation>({latitude:0,longitude:0})
+    const [showOtpBox, setShowOtpBox] = useState(false)
+    const [otp, setOtp] = useState("")
     const { userData } = useSelector((state:RootState) => state.user)
 
     const fetchAssignment = async () => {
@@ -75,11 +77,32 @@ function DeliveryBoyDashboard() {
       return () => socket.off("new-assignment")
     },[]) 
 
+    useEffect(() => {
+      const socket = getSocket()
+      socket.on("update-deliveryBoy-location", ({ userId, location }) => {
+        setDeliveryBoyLocation({
+          latitude: location.coordinates[1],
+          longitude: location.coordinates[0]
+        })
+      })
+      return () =>{ socket.off("update-deliveryBoy-location") }
+    },[])
+
     useEffect(()=> {
       fetchCurrentOrder()    
       fetchAssignment()
     },[userData])
 
+
+  const sendOtp = async () => {
+    try {
+      const result = await axios.post("/api/delivery/otp/send", { orderId: activeOrder.order?._id })
+      console.log(result.data)
+      setShowOtpBox(true)
+    } catch (error) {
+      console.log(error)
+    }
+  }  
 
   if (activeOrder && userLocation) {
     return (
@@ -93,6 +116,21 @@ function DeliveryBoyDashboard() {
             <LiveMap userLocation={userLocation} deliveryBoyLocation={deliveryBoyLocation} />
           </div>
           <DeliveryChat orderId={activeOrder.order._id} deliveryBoyId={userData?._id!} />
+          <div className='mt-6 text-white rounded-xl border border-gray-950 shadow p-6'>
+            {!activeOrder.order.deliveryOtpVerification && !showOtpBox && (
+              <button onClick={sendOtp} className='w-full py-4 bg-green-600 text-white rounded-lg'>
+                Mark as Delivered
+              </button>
+            )}
+            { showOtpBox && (
+              <div className="mt-4">
+                <input type="text" className='w-full py-3 border border-gray-950 rounded-lg text-center' placeholder='Enter OTP' maxLength={4} />
+                <button className='w-full mt-4 bg-blue-600 text-white rounded-lg py-3'>
+                  Verify OTP
+                </button>
+              </div>
+            ) }
+          </div>
         </div>
       </div>
     )

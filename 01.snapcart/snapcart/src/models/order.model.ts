@@ -29,6 +29,9 @@ export interface IOrder {
     assignment?: mongoose.Types.ObjectId
     assignedDeliveryBoy?: mongoose.Types.ObjectId
     status:"pending" | "out of delivery" | "delivered"
+    deliveryOtp: string | null
+    deliveryOtpVerification: Boolean
+    deliverAt: Date
     createdAt?:Date
     updatedAt?:Date
 }
@@ -65,7 +68,10 @@ const orderSchema = new mongoose.Schema<IOrder>({
         type: mongoose.Schema.Types.ObjectId,
         ref:"User"
     },
-    status: { type:String, enum:["pending","out of delivery","delivered"], default:"pending" }
+    status: { type:String, enum:["pending","out of delivery","delivered"], default:"pending" },
+    deliveryOtp: { type:String, default:null },
+    deliveryOtpVerification: { type:Boolean, default:false },
+    deliverAt: { type:Date }
 },{timestamps:true})
 
 const Order = mongoose.models.Order || mongoose.model("Order", orderSchema)

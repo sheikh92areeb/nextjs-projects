@@ -41,7 +41,7 @@ function LiveMap({userLocation, deliveryBoyLocation}:Iprops ) {
   const linePosition = deliveryBoyLocation && userLocation ? [[userLocation.latitude, userLocation.longitude],[deliveryBoyLocation.latitude, deliveryBoyLocation.longitude]] : []
 
   return (
-    <div className='w-full h-125 rounded-xl overflow-hidden shadow relative'>
+    <div className='w-full h-125 rounded-xl overflow-hidden shadow relative z-2'>
       <MapContainer center={center as LatLngExpression} zoom={13} scrollWheelZoom={true} className='w-full h-full' >
         <Recenter positions={center as any} />
         <TileLayer 
